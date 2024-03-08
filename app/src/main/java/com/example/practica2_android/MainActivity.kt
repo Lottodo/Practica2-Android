@@ -39,6 +39,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -46,6 +47,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.example.practica2_android.ui.theme.Practica2AndroidTheme
 import java.io.InputStream
+import java.time.format.TextStyle
 import androidx.compose.material3.TextButton as TextButton1
 
 
@@ -88,6 +90,7 @@ fun QuestionGame(context : Context, modifier : Modifier = Modifier) {
     var ronda by remember { mutableIntStateOf(0) }
     var puntos by remember { mutableIntStateOf(0) }
     var flag = true
+    val openDialogCustom = remember{ mutableStateOf(false) }
 
     //Debug
     val toastS = Toast.makeText(LocalContext.current,"Salir",Toast.LENGTH_SHORT)
@@ -95,10 +98,8 @@ fun QuestionGame(context : Context, modifier : Modifier = Modifier) {
 
 
     if (ronda>=6){
+        openDialogCustom.value = true
         flag = false
-
-        DialogWithOptions(onDismissRequest = { toastS.show() },
-            onConfirmation = { toastR.show() }, puntos)
     }
 
     val game = Game(context)
@@ -112,6 +113,7 @@ fun QuestionGame(context : Context, modifier : Modifier = Modifier) {
     val res4String = questionList[5]
 
 
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -120,39 +122,13 @@ fun QuestionGame(context : Context, modifier : Modifier = Modifier) {
         horizontalAlignment = Alignment.CenterHorizontally
 
     ) {
-        Text(
-            text = "Ronda $rondaString",
-            fontSize = 18.sp,
-            textAlign = TextAlign.Center
-        )
-        Card(
-            elevation = CardDefaults.cardElevation(defaultElevation = 5.dp),
-            shape = RoundedCornerShape(15.dp),
-            //border = BorderStroke(2.dp, Color.Black),
-            colors = CardDefaults.cardColors(containerColor = Color.White),
-            modifier = Modifier
-                .padding(4.dp)
-                .wrapContentSize(Alignment.Center)
-                .height(150.dp)
-                .width(375.dp)
-        )
-        {
-            Column (
-                modifier = modifier,
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-            ) {
-                Text(
-                    modifier = Modifier.padding(8.dp),
-                    text = questionString,
-                    fontSize = 26.sp,
-                    textAlign = TextAlign.Center
-                )
-            }
-        }
+        GameQuestionCard(modifier, rondaString, questionString)
 
         Spacer(modifier = Modifier.padding(16.dp))
-        GameButton(onClicky = { ronda += 1; if(game.checkQuestion(0)) puntos += 1 }, buttonString = res1String)
+        GameButton(onClicky = {
+            ronda += 1
+            if(game.checkQuestion(0)) puntos += 1
+                              }, buttonString = res1String)
         Spacer(modifier = Modifier.padding(8.dp))
         GameButton(onClicky = { ronda += 1; if(game.checkQuestion(1)) puntos += 1 }, buttonString = res2String)
         Spacer(modifier = Modifier.padding(8.dp))
@@ -160,77 +136,71 @@ fun QuestionGame(context : Context, modifier : Modifier = Modifier) {
         Spacer(modifier = Modifier.padding(8.dp))
         GameButton(onClicky = { ronda += 1; if(game.checkQuestion(3)) puntos += 1 }, buttonString = res4String)
     }
+
+    if (openDialogCustom.value) {
+        CustomDialog(openDialogCustom = openDialogCustom,
+            restartOnClick = {
+                game.restartGame()
+                flag = false
+                ronda = 0
+            },
+            puntos
+        )
+
+    }
 }
 
 @Composable
 fun GameButton(onClicky: () -> Unit,
-               buttonString: String, ) {
+               buttonString: String ) {
     OutlinedButton(
-        onClick = { onClicky }
+        onClick = onClicky
     ) {
         Text(
             text = buttonString,
-            fontSize = 20.sp
+            fontSize = 20.sp,
+            color = Color(0xFF9C27B0)
         )
     }
 }
 
 @Composable
-fun DialogWithOptions(onDismissRequest: () -> Unit,
-                      onConfirmation: () -> Unit,
-           puntos: Int) {
-
-    Dialog(onDismissRequest = { onDismissRequest() }) {
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(375.dp)
-                .padding(16.dp),
-            shape = RoundedCornerShape(16.dp),
+fun GameQuestionCard(modifier: Modifier, rondaString: String, questionString: String) {
+    Card(
+        elevation = CardDefaults.cardElevation(defaultElevation = 5.dp),
+        shape = RoundedCornerShape(15.dp),
+        //border = BorderStroke(2.dp, Color.Black),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        modifier = Modifier
+            .padding(4.dp)
+            .wrapContentSize(Alignment.Center)
+            .height(200.dp)
+            .width(375.dp)
+    )
+    {
+        Column (
+            modifier = modifier,
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         ) {
-            Column(
+            Text(
+                text = "Ronda $rondaString",
+                fontSize = 18.sp,
+                textAlign = TextAlign.Center,
+                fontStyle = FontStyle.Italic,
                 modifier = Modifier
-                    .fillMaxSize(),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                Text(
-                    text = "Fin del juego",
-                    modifier = Modifier
-                        .wrapContentSize(Alignment.Center)
-                        .padding(8.dp),
-                    textAlign = TextAlign.Center,
-                    fontSize = 40.sp
-                )
-                Text(
-                    text = "Puntaje: $puntos",
-                    modifier = Modifier
-                        .wrapContentSize(Alignment.Center)
-                        .padding(8.dp),
-                    textAlign = TextAlign.Center,
-                    fontSize = 25.sp
-                )
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center,
-                ) {
-                    TextButton1(
-                        onClick = { onDismissRequest() },
-                        modifier = Modifier.padding(8.dp),
-                    ) {
-                        Text("Salir")
-                    }
-                    TextButton1(
-                        onClick = { onConfirmation()
-
-                                  },
-                        modifier = Modifier.padding(8.dp),
-                    ) {
-                        Text("Volver a jugar")
-                    }
-                }
-            }
+                    .fillMaxWidth()
+                    .padding(bottom = 10.dp)
+                    .align(Alignment.Start)
+                    .background(MaterialTheme.colorScheme.tertiaryContainer)
+            )
+            Text(
+                modifier = Modifier
+                    .padding(8.dp),
+                text = questionString,
+                fontSize = 26.sp,
+                textAlign = TextAlign.Center
+            )
         }
     }
 }
