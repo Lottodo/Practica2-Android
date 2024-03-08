@@ -88,6 +88,8 @@ fun QuestionGame(context : Context, modifier : Modifier = Modifier) {
     var ronda by remember { mutableIntStateOf(0) }
     var puntos by remember { mutableIntStateOf(0) }
     var flag = true
+
+    //Debug
     val toastS = Toast.makeText(LocalContext.current,"Salir",Toast.LENGTH_SHORT)
     val toastR = Toast.makeText(LocalContext.current,"Reiniciar",Toast.LENGTH_SHORT)
 
@@ -95,12 +97,8 @@ fun QuestionGame(context : Context, modifier : Modifier = Modifier) {
     if (ronda>=6){
         flag = false
 
-        val onDismissRequest: () -> Unit = { toastS.show() }
-        val onConfirmation: () -> Unit = {
-            toastR.show()
-        }
-        DialogWithOptions(onDismissRequest = onDismissRequest,
-            onConfirmation = onConfirmation, puntos)
+        DialogWithOptions(onDismissRequest = { toastS.show() },
+            onConfirmation = { toastR.show() }, puntos)
     }
 
     val game = Game(context)
@@ -153,65 +151,27 @@ fun QuestionGame(context : Context, modifier : Modifier = Modifier) {
             }
         }
 
-
-
         Spacer(modifier = Modifier.padding(16.dp))
+        GameButton(onClicky = { ronda += 1; if(game.checkQuestion(0)) puntos += 1 }, buttonString = res1String)
+        Spacer(modifier = Modifier.padding(8.dp))
+        GameButton(onClicky = { ronda += 1; if(game.checkQuestion(1)) puntos += 1 }, buttonString = res2String)
+        Spacer(modifier = Modifier.padding(8.dp))
+        GameButton(onClicky = { ronda += 1; if(game.checkQuestion(2)) puntos += 1 }, buttonString = res3String)
+        Spacer(modifier = Modifier.padding(8.dp))
+        GameButton(onClicky = { ronda += 1; if(game.checkQuestion(3)) puntos += 1 }, buttonString = res4String)
+    }
+}
 
-        OutlinedButton(
-            onClick = {
-                ronda += 1
-                if(game.checkQuestion(0)) {
-                    puntos += 1
-                }
-            },
-            modifier = Modifier
-                .align(Alignment.CenterHorizontally)
-                .background(Color.White)
-        ) {
-            Text(
-                    text = res1String,
-                    fontSize = 20.sp
-                )
-        }
-        Spacer(modifier = Modifier.padding(8.dp))
-        OutlinedButton(
-            onClick = {
-                ronda += 1
-                if(game.checkQuestion(1)) puntos += 1
-            },
-            modifier = Modifier.align(Alignment.CenterHorizontally)
-        ) {
-            Text(
-                text = res2String,
-                fontSize = 20.sp
-            )
-        }
-        Spacer(modifier = Modifier.padding(8.dp))
-        OutlinedButton(
-            onClick = {
-                ronda += 1
-                if(game.checkQuestion(2)) puntos += 1
-            },
-            modifier = Modifier.align(Alignment.CenterHorizontally)
-        ) {
-            Text(
-                text = res3String,
-                fontSize = 20.sp
-            )
-        }
-        Spacer(modifier = Modifier.padding(8.dp))
-        OutlinedButton(
-            onClick = {
-                ronda += 1
-                if(game.checkQuestion(3)) puntos += 1
-            },
-            modifier = Modifier.align(Alignment.CenterHorizontally)
-        ) {
-            Text(
-                text = res4String,
-                fontSize = 20.sp
-            )
-        }
+@Composable
+fun GameButton(onClicky: () -> Unit,
+               buttonString: String, ) {
+    OutlinedButton(
+        onClick = { onClicky }
+    ) {
+        Text(
+            text = buttonString,
+            fontSize = 20.sp
+        )
     }
 }
 
@@ -262,7 +222,9 @@ fun DialogWithOptions(onDismissRequest: () -> Unit,
                         Text("Salir")
                     }
                     TextButton1(
-                        onClick = { onConfirmation() },
+                        onClick = { onConfirmation()
+
+                                  },
                         modifier = Modifier.padding(8.dp),
                     ) {
                         Text("Volver a jugar")
