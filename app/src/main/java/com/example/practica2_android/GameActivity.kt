@@ -1,7 +1,6 @@
 package com.example.practica2_android
 
 import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -22,11 +21,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.FilledTonalButton
-import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
@@ -45,7 +41,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -56,7 +51,7 @@ import java.time.format.TextStyle
 import androidx.compose.material3.TextButton as TextButton1
 
 
-class MainActivity : ComponentActivity() {
+class GameActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -72,54 +67,9 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    MenuUI(
-                        playGame = { goToGame() }
-                    )
+                    QuestionApp(this)
                 }
             }
         }
-    }
-
-    private fun goToGame() {
-        val intent = Intent(this, GameActivity::class.java)
-        startActivity(intent)
-    }
-}
-
-@Composable
-fun MenuUI(playGame: () -> Unit) {
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .wrapContentSize(Alignment.Center)
-
-    ) {
-        Text(
-            text = "Gaem",
-            textAlign = TextAlign.Center,
-            modifier = Modifier
-                .padding(top = 5.dp)
-                .fillMaxWidth(),
-            style = MaterialTheme.typography.titleLarge,
-            maxLines = 2,
-            overflow = TextOverflow.Ellipsis
-        )
-
-        FilledTonalButton(
-            onClick = playGame,
-            shape = MaterialTheme.shapes.medium
-        ) {
-            Text(
-                text = "Jugar",
-                textAlign = TextAlign.Center,
-                modifier = Modifier
-                    .padding(top = 5.dp)
-                    .fillMaxWidth(),
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis
-            )
-        }
-
     }
 }

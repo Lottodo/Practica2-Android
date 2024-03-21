@@ -1,6 +1,7 @@
 package com.example.practica2_android
 
-import android.annotation.SuppressLint
+import android.app.Activity
+import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -15,7 +16,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.Modifier
@@ -23,19 +23,21 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 
 @Composable
-fun CustomDialog(openDialogCustom: MutableState<Boolean>, restartOnClick: () -> Unit, puntos: Int) {
+fun CustomDialog(openDialogCustom: MutableState<Boolean>, restartOnClick: () -> Unit, finishOnClick: () -> Unit, puntos: Int) {
     Dialog(onDismissRequest = { openDialogCustom.value = false}) {
-        CustomDialogUI(openDialogCustom = openDialogCustom, restartOnClick = restartOnClick, puntos = puntos)
+        CustomDialogUI(openDialogCustom = openDialogCustom, restartOnClick = restartOnClick, finishOnClick = finishOnClick, puntos = puntos)
     }
 }
 
 @Composable
 fun CustomDialogUI(modifier: Modifier = Modifier, openDialogCustom: MutableState<Boolean>,
                    restartOnClick: () -> Unit,
-                   puntos: Int) {
+                   finishOnClick: () -> Unit,
+                   puntos: Int
+) {
+
     Card(
         shape = RoundedCornerShape(10.dp),
         modifier = Modifier
@@ -86,7 +88,12 @@ fun CustomDialogUI(modifier: Modifier = Modifier, openDialogCustom: MutableState
                     .background(MaterialTheme.colorScheme.tertiaryContainer),
                 horizontalArrangement = Arrangement.SpaceAround
             ) {
-                TextButton(onClick = { openDialogCustom.value = false }) {
+                TextButton(
+                    onClick = {
+                        openDialogCustom.value = false
+                        finishOnClick()
+                    }
+                ) {
                     Text(
                         text = "Salir al menú",
                         style = MaterialTheme.typography.labelLarge,
