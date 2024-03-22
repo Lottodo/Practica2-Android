@@ -13,16 +13,21 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -32,6 +37,8 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @Composable
 fun QuestionApp(context : Context) {
@@ -78,16 +85,28 @@ fun QuestionGame(context : Context, modifier : Modifier = Modifier) {
         GameQuestionCard(modifier, rondaString, questionString)
 
         Spacer(modifier = Modifier.padding(16.dp))
-        GameButton(onClicky = {
-            ronda += 1
-            if(game.checkQuestion(0)) puntos += 1
-        }, buttonString = res1String)
+
+        GameButton(isRed = game.checkQuestion(0),
+            onClicky = { ronda += 1; if(game.checkQuestion(0)) puntos += 1 },
+            buttonString = res1String)
+
         Spacer(modifier = Modifier.padding(8.dp))
-        GameButton(onClicky = { ronda += 1; if(game.checkQuestion(1)) puntos += 1 }, buttonString = res2String)
+
+        GameButton(isRed = game.checkQuestion(0),
+            onClicky = { ronda += 1; if(game.checkQuestion(1)) puntos += 1 },
+            buttonString = res2String)
+
         Spacer(modifier = Modifier.padding(8.dp))
-        GameButton(onClicky = { ronda += 1; if(game.checkQuestion(2)) puntos += 1 }, buttonString = res3String)
+
+        GameButton(isRed = game.checkQuestion(0),
+            onClicky = { ronda += 1; if(game.checkQuestion(2)) puntos += 1 },
+            buttonString = res3String)
+
         Spacer(modifier = Modifier.padding(8.dp))
-        GameButton(onClicky = { ronda += 1; if(game.checkQuestion(3)) puntos += 1 }, buttonString = res4String)
+
+        GameButton(isRed = game.checkQuestion(0),
+            onClicky = { ronda += 1; if(game.checkQuestion(3)) puntos += 1 },
+            buttonString = res4String)
     }
 
     if (openDialogCustom.value) {
@@ -109,9 +128,30 @@ fun QuestionGame(context : Context, modifier : Modifier = Modifier) {
 
 @Composable
 fun GameButton(onClicky: () -> Unit,
-               buttonString: String ) {
-    OutlinedButton(
-        onClick = onClicky
+               buttonString: String,
+               isRed: Boolean) {
+    val defaultColor = MaterialTheme.colorScheme.primary
+    var buttonColor by remember { mutableStateOf(Color.Blue) }
+    var buttonText by remember { mutableStateOf("Click me") }
+    var isEnabled by remember { mutableStateOf(true) }
+    val coroutineScope = rememberCoroutineScope()
+
+    Button(onClick = {
+            isEnabled = false
+            buttonText = "Processing..."
+            buttonColor = if (isRed) Color.Red else Color.Blue
+
+            // Freeze for 2 seconds
+            coroutineScope.launch {
+                delay(2000)
+                buttonColor = defaultColor // Sets back to the default color
+                buttonText = "Click me"
+                isEnabled = true
+            }
+            onClicky()
+        },
+
+        enabled = isEnabled
     ) {
         Text(
             text = buttonString,
@@ -120,6 +160,8 @@ fun GameButton(onClicky: () -> Unit,
         )
     }
 }
+
+data class ColorHolder(val color: Color)
 
 @Composable
 fun GameQuestionCard(modifier: Modifier, rondaString: String, questionString: String) {
